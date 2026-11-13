@@ -1,5 +1,5 @@
 package br.com.tecsobral.estoque.service;
 
-public class Movimentacao {
+public class MovimentacaoService {
     
 }

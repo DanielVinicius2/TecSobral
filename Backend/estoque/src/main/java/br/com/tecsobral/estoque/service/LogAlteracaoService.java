@@ -1,5 +1,5 @@
 package br.com.tecsobral.estoque.service;
 
-public class LogAlteracao {
+public class LogAlteracaoService {
     
 }
