@@ -1,5 +1,7 @@
 package br.com.tecsobral.estoque.model.enums;
 
-public class TipoMovimentacao {
-    
+public enum TipoMovimentacao {
+    ENTRADA,
+    SAIDA,
+    CORRECAO
 }
