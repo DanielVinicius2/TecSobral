@@ -1,0 +1,8 @@
+import { esc, pageHeading, tableEmpty, dateTime } from '../components/ui.js';
+
+export async function renderBackups({ api }) {
+  const backups = await api.request('/backups');
+  return `${pageHeading('Backups', 'Crie e restaure cópias do banco de dados.', '<button class="btn primary" data-action="create-backup">＋ Criar backup</button>')}
+    <section class="panel" style="margin-bottom:16px"><div class="panel-head"><div><h2>Proteção dos dados</h2><p>A rotina automática é executada no horário configurado no backend. A restauração substitui os dados atuais.</p></div><span class="stat-icon">◷</span></div><p class="toolbar-note">Sempre confirme a data do arquivo antes de restaurar. O sistema cria uma cópia de segurança do estado atual antes da restauração.</p></section>
+    <section class="table-panel"><div class="toolbar"><strong style="font:700 14px Manrope">Cópias recentes</strong><span class="toolbar-note">${backups.length} registro(s)</span></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Arquivo</th><th>Tamanho</th><th>Status</th><th class="text-right">Ação</th></tr></thead><tbody>${backups.map(backup => `<tr><td>${dateTime(backup.dataHora)}</td><td><span class="code-pill">${esc(backup.arquivo)}</span></td><td>${backup.tamanhoBytes == null ? '—' : `${(backup.tamanhoBytes / 1024 / 1024).toFixed(2)} MB`}</td><td><span class="badge ${backup.status === 'SUCESSO' ? 'entry' : 'negative'}">${esc(backup.status)}</span></td><td><div class="row-actions">${backup.status === 'SUCESSO' ? `<button class="btn small danger" data-action="restore-backup" data-id="${backup.id}" data-file="${esc(backup.arquivo)}">Restaurar</button>` : '—'}</div></td></tr>`).join('') || tableEmpty('Nenhum backup registrado.')}</tbody></table></div></section>`;
+}

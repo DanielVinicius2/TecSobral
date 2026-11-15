@@ -36,25 +36,25 @@ public interface ProdutoRepository extends JpaRepository<Produto, Integer> {
     List<Produto> findProdutosParaAlerta();
 
     @Query(value = "SELECT p FROM Produto p LEFT JOIN p.categoria c WHERE " +
-           "(:termo IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :termo, '%')) " +
-           "OR LOWER(p.codigo) LIKE LOWER(CONCAT('%', :termo, '%')) " +
-           "OR LOWER(c.nome) LIKE LOWER(CONCAT('%', :termo, '%')) " +
-           "OR LOWER(COALESCE(p.cor, '')) LIKE LOWER(CONCAT('%', :termo, '%')) " +
-           "OR LOWER(COALESCE(p.tamanho, '')) LIKE LOWER(CONCAT('%', :termo, '%'))) " +
+           "(:termo IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) " +
+           "OR LOWER(p.codigo) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) " +
+           "OR LOWER(c.nome) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) " +
+           "OR LOWER(COALESCE(p.cor, '')) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) " +
+           "OR LOWER(COALESCE(p.tamanho, '')) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%'))) " +
            "AND (:categoriaId IS NULL OR c.idCategoria = :categoriaId) " +
-           "AND (:cor IS NULL OR LOWER(COALESCE(p.cor, '')) LIKE LOWER(CONCAT('%', :cor, '%'))) " +
-           "AND (:tamanho IS NULL OR LOWER(COALESCE(p.tamanho, '')) LIKE LOWER(CONCAT('%', :tamanho, '%'))) " +
+           "AND (:cor IS NULL OR LOWER(COALESCE(p.cor, '')) LIKE LOWER(CONCAT('%', CAST(:cor AS string), '%'))) " +
+           "AND (:tamanho IS NULL OR LOWER(COALESCE(p.tamanho, '')) LIKE LOWER(CONCAT('%', CAST(:tamanho AS string), '%'))) " +
            "AND (:apenasAlertas = FALSE OR p.quantidadeAtual < 0 OR " +
            "(p.estoqueMinimo IS NOT NULL AND p.quantidadeAtual < p.estoqueMinimo))",
            countQuery = "SELECT COUNT(p) FROM Produto p LEFT JOIN p.categoria c WHERE " +
-           "(:termo IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :termo, '%')) " +
-           "OR LOWER(p.codigo) LIKE LOWER(CONCAT('%', :termo, '%')) " +
-           "OR LOWER(c.nome) LIKE LOWER(CONCAT('%', :termo, '%')) " +
-           "OR LOWER(COALESCE(p.cor, '')) LIKE LOWER(CONCAT('%', :termo, '%')) " +
-           "OR LOWER(COALESCE(p.tamanho, '')) LIKE LOWER(CONCAT('%', :termo, '%'))) " +
+           "(:termo IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) " +
+           "OR LOWER(p.codigo) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) " +
+           "OR LOWER(c.nome) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) " +
+           "OR LOWER(COALESCE(p.cor, '')) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) " +
+           "OR LOWER(COALESCE(p.tamanho, '')) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%'))) " +
            "AND (:categoriaId IS NULL OR c.idCategoria = :categoriaId) " +
-           "AND (:cor IS NULL OR LOWER(COALESCE(p.cor, '')) LIKE LOWER(CONCAT('%', :cor, '%'))) " +
-           "AND (:tamanho IS NULL OR LOWER(COALESCE(p.tamanho, '')) LIKE LOWER(CONCAT('%', :tamanho, '%'))) " +
+           "AND (:cor IS NULL OR LOWER(COALESCE(p.cor, '')) LIKE LOWER(CONCAT('%', CAST(:cor AS string), '%'))) " +
+           "AND (:tamanho IS NULL OR LOWER(COALESCE(p.tamanho, '')) LIKE LOWER(CONCAT('%', CAST(:tamanho AS string), '%'))) " +
            "AND (:apenasAlertas = FALSE OR p.quantidadeAtual < 0 OR " +
            "(p.estoqueMinimo IS NOT NULL AND p.quantidadeAtual < p.estoqueMinimo))")
     Page<Produto> pesquisarProdutos(@Param("termo") String termo,
