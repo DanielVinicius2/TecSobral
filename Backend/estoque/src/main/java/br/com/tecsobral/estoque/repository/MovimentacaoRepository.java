@@ -31,20 +31,22 @@ public interface MovimentacaoRepository extends JpaRepository<Movimentacao, Inte
     List<Movimentacao> findByDataHoraBetweenOrderByDataHoraDesc(LocalDateTime inicio, LocalDateTime fim);
 
     @Query(value = "SELECT m FROM Movimentacao m LEFT JOIN m.produto p JOIN m.usuario u WHERE " +
-           "(:inicio IS NULL OR m.dataHora >= :inicio) AND (:fim IS NULL OR m.dataHora < :fim) " +
+           "(CAST(:inicio AS LocalDateTime) IS NULL OR m.dataHora >= :inicio) " +
+           "AND (CAST(:fim AS LocalDateTime) IS NULL OR m.dataHora < :fim) " +
            "AND (:tipo IS NULL OR m.tipo = :tipo) " +
            "AND (:produtoId IS NULL OR p.idProduto = :produtoId) " +
            "AND (:usuarioId IS NULL OR u.idUsuario = :usuarioId) " +
-           "AND (:termo IS NULL OR LOWER(m.codigoProduto) LIKE LOWER(CONCAT('%', :termo, '%')) " +
-           "OR LOWER(m.nomeProduto) LIKE LOWER(CONCAT('%', :termo, '%'))) " +
+           "AND (:termo IS NULL OR LOWER(m.codigoProduto) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) " +
+           "OR LOWER(m.nomeProduto) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%'))) " +
            "ORDER BY m.dataHora DESC, m.idMovimentacao DESC",
            countQuery = "SELECT COUNT(m) FROM Movimentacao m LEFT JOIN m.produto p JOIN m.usuario u WHERE " +
-           "(:inicio IS NULL OR m.dataHora >= :inicio) AND (:fim IS NULL OR m.dataHora < :fim) " +
+           "(CAST(:inicio AS LocalDateTime) IS NULL OR m.dataHora >= :inicio) " +
+           "AND (CAST(:fim AS LocalDateTime) IS NULL OR m.dataHora < :fim) " +
            "AND (:tipo IS NULL OR m.tipo = :tipo) " +
            "AND (:produtoId IS NULL OR p.idProduto = :produtoId) " +
            "AND (:usuarioId IS NULL OR u.idUsuario = :usuarioId) " +
-           "AND (:termo IS NULL OR LOWER(m.codigoProduto) LIKE LOWER(CONCAT('%', :termo, '%')) " +
-           "OR LOWER(m.nomeProduto) LIKE LOWER(CONCAT('%', :termo, '%')))")
+           "AND (:termo IS NULL OR LOWER(m.codigoProduto) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) " +
+           "OR LOWER(m.nomeProduto) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')))")
     Page<Movimentacao> pesquisarHistorico(@Param("inicio") LocalDateTime inicio,
             @Param("fim") LocalDateTime fim,
             @Param("tipo") TipoMovimentacao tipo,

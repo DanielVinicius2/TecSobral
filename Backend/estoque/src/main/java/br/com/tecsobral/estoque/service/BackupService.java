@@ -26,6 +26,7 @@ import br.com.tecsobral.estoque.repository.BackupRepository;
 @Service
 public class BackupService {
     private static final ZoneId ZONA = ZoneId.of("America/Sao_Paulo");
+    private static final System.Logger LOGGER = System.getLogger(BackupService.class.getName());
     private final BackupRepository backups;
     private final LogAlteracaoService auditoria;
     private final Path diretorio;
@@ -34,8 +35,8 @@ public class BackupService {
     public BackupService(BackupRepository backups, LogAlteracaoService auditoria,
             @Value("${app.backup.directory:./backups}") String diretorio,
             @Value("${DB_URL:}") String dbUrl,
-            @Value("${DB_USERNAME:}") String dbUsuario,
-            @Value("${DB_PASSWORD:}") String dbSenha,
+            @Value("${DB_USUARIO:}") String dbUsuario,
+            @Value("${DB_SENHA:}") String dbSenha,
             @Value("${app.backup.pg-dump:pg_dump}") String pgDump,
             @Value("${app.backup.pg-restore:pg_restore}") String pgRestore) {
         this.backups=backups; this.auditoria=auditoria; this.diretorio=Path.of(diretorio).toAbsolutePath().normalize(); this.dbUrl=dbUrl;
@@ -76,6 +77,10 @@ public class BackupService {
             List<String> args=new ArrayList<>(); args.add(pgDump); args.addAll(conexao()); args.addAll(List.of("--format=custom","--no-owner","--file",destino.toString()));
             executar(args,"backup"); registro.setTamanhoBytes(Files.size(destino)); registro.setStatus(StatusBackup.SUCESSO);
         } catch(Exception e) {
+            String motivo = e instanceof RegraNegocioException
+                    ? e.getMessage()
+                    : "Falha inesperada (" + e.getClass().getSimpleName() + ").";
+            LOGGER.log(System.Logger.Level.ERROR, "Backup falhou: " + motivo);
             registro.setTamanhoBytes(null);
         }
         return backups.save(registro);
@@ -89,7 +94,7 @@ public class BackupService {
         if(database.isBlank()) throw new RegraNegocioException("DB_URL precisa informar o nome do banco.");
         String user=dbUsuario;
         if((user==null||user.isBlank())&&uri.getUserInfo()!=null){String[] info=uri.getUserInfo().split(":",2);user=info[0];}
-        if(user==null||user.isBlank()) throw new RegraNegocioException("Configure DB_USERNAME para executar backups PostgreSQL.");
+        if(user==null||user.isBlank()) throw new RegraNegocioException("Configure DB_USUARIO para executar backups PostgreSQL.");
         return new ArrayList<>(List.of("--host",host,"--port",Integer.toString(port),"--username",user,"--dbname",database));
     }
 
