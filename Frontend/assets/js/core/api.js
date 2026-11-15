@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = window.TECSOBRAL_API_BASE || 'http://localhost:8080/api';
 const SESSION_KEY = 'tecsobral.session.v1';
 
 export class ApiError extends Error {

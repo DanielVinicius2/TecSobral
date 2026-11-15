@@ -13,6 +13,13 @@ O backend deve estar disponível em `http://localhost:8080`. A configuração CO
 
 O login é validado por `POST /api/auth/login`; as rotas protegidas usam HTTP Basic. Para manter a sessão ao atualizar a página, o cabeçalho de autenticação fica no `sessionStorage` até sair ou fechar a aba. Esse valor é reversível e acessível ao JavaScript da página; use apenas em um dispositivo confiável e mantenha o frontend protegido contra XSS.
 
+## Publicar no Vercel e Render
+
+- Publique `Backend/estoque` como Web Service Docker no Render, usando essa pasta como **Root Directory**. O `Dockerfile` está nessa pasta.
+- Configure no Render os segredos `DB_URL`, `DB_USUARIO` e `DB_SENHA` para o banco Supabase. Configure também `APP_CORS_ORIGINS` com a origem do site Vercel e, se necessário, `http://localhost:5173`.
+- Depois que o Render fornecer a URL HTTPS do backend, atualize `Frontend/api-config.js` para `https://SUA-API.onrender.com/api`, faça commit e redeploy do frontend no Vercel.
+- O backup local usa o disco do serviço; em instâncias Render com sistema de arquivos efêmero, os arquivos podem sumir ao reiniciar. Configure armazenamento persistente antes de depender desses backups.
+
 ## Estrutura
 
 - `index.html`: página inicial.
