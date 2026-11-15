@@ -17,7 +17,7 @@ O login é validado por `POST /api/auth/login`; as rotas protegidas usam HTTP Ba
 
 - Publique `Backend/estoque` como Web Service Docker no Render, usando essa pasta como **Root Directory**. O `Dockerfile` está nessa pasta.
 - Configure no Render os segredos `DB_URL`, `DB_USUARIO` e `DB_SENHA` para o banco Supabase. Configure também `APP_CORS_ORIGINS` com a origem do site Vercel e, se necessário, `http://localhost:5173`.
-- Depois que o Render fornecer a URL HTTPS do backend, atualize `Frontend/api-config.js` para `https://SUA-API.onrender.com/api`, faça commit e redeploy do frontend no Vercel.
+- A URL atual da API em `Frontend/api-config.js` é `https://tecsobral.onrender.com/api`.
 - O backup local usa o disco do serviço; em instâncias Render com sistema de arquivos efêmero, os arquivos podem sumir ao reiniciar. Configure armazenamento persistente antes de depender desses backups.
 
 ## Estrutura

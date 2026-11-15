@@ -1,1 +1,1 @@
-window.TECSOBRAL_API_BASE = 'http://localhost:8080/api';
+window.TECSOBRAL_API_BASE = 'https://tecsobral.onrender.com/api';
