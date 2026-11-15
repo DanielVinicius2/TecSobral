@@ -1,4 +1,5 @@
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = window.TECSOBRAL_API_BASE || 'http://localhost:8080/api';
+const SESSION_KEY = 'tecsobral.session.v1';
 
 export class ApiError extends Error {
   constructor(message, status, data = null) {
@@ -15,6 +16,34 @@ function basicHeader(login, password) {
   return `Basic ${btoa(binary)}`;
 }
 
+function restoreSession(state) {
+  const saved = sessionStorage.getItem(SESSION_KEY);
+  if (!saved) return;
+
+  let session;
+  try {
+    session = JSON.parse(saved);
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) throw error;
+    sessionStorage.removeItem(SESSION_KEY);
+    return;
+  }
+
+  if (typeof session?.header !== 'string'
+      || !session.header.startsWith('Basic ')
+      || !session.user
+      || typeof session.user.id !== 'number'
+      || typeof session.user.nome !== 'string'
+      || typeof session.user.login !== 'string'
+      || !['PROPRIETARIO', 'FUNCIONARIO'].includes(session.user.perfil)) {
+    sessionStorage.removeItem(SESSION_KEY);
+    return;
+  }
+
+  state.auth = { header: session.header };
+  state.user = session.user;
+}
+
 async function parseResponse(response) {
   if (response.status === 204) return null;
   const contentType = response.headers.get('content-type') || '';
@@ -25,6 +54,14 @@ async function parseResponse(response) {
 }
 
 export function createApiClient(state, onUnauthorized) {
+  restoreSession(state);
+
+  function clearSession() {
+    state.auth = null;
+    state.user = null;
+    sessionStorage.removeItem(SESSION_KEY);
+  }
+
   async function rawRequest(path, options = {}, auth = state.auth, readBody = true) {
     const headers = new Headers(options.headers || {});
     if (auth?.header) headers.set('Authorization', auth.header);
@@ -39,8 +76,7 @@ export function createApiClient(state, onUnauthorized) {
     const data = readBody ? await parseResponse(response) : null;
     if (response.status === 401) {
       if (state.auth && auth === state.auth) {
-        state.auth = null;
-        state.user = null;
+        clearSession();
         onUnauthorized();
       }
       throw new ApiError(data?.mensagem || 'Login ou senha inválidos.', 401, data);
@@ -64,6 +100,10 @@ export function createApiClient(state, onUnauthorized) {
       method: 'POST',
       body: JSON.stringify({ login, senha: password }),
     }, null);
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+      header: credentials.header,
+      user,
+    }));
     state.auth = credentials;
     state.user = user;
     return user;
@@ -80,8 +120,7 @@ export function createApiClient(state, onUnauthorized) {
   }
 
   function logout() {
-    state.auth = null;
-    state.user = null;
+    clearSession();
   }
 
   return { request, login, logout, downloadCsv };
